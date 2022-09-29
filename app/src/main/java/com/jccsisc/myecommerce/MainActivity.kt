@@ -26,6 +26,11 @@ class MainActivity : AppCompatActivity() {
             if (user != null) {
                 Toast.makeText(this@MainActivity, "Bienvenido ", Toast.LENGTH_SHORT).show()
             }
+        } else {
+            if (response == null) {
+                Toast.makeText(this@MainActivity, "Hasta pronto ", Toast.LENGTH_SHORT).show()
+                finish()
+            }
         }
     }
 
@@ -49,7 +54,10 @@ class MainActivity : AppCompatActivity() {
             if (auth.currentUser != null) {
                 supportActionBar?.title = auth.currentUser?.displayName
             } else {
-                val providers = arrayListOf(AuthUI.IdpConfig.EmailBuilder().build())
+                val providers = arrayListOf(
+                    AuthUI.IdpConfig.EmailBuilder().build(),
+                    AuthUI.IdpConfig.GoogleBuilder().build()
+                )
 
                 resultLauncher.launch(AuthUI.getInstance()
                     .createSignInIntentBuilder()
@@ -80,6 +88,13 @@ class MainActivity : AppCompatActivity() {
                 AuthUI.getInstance().signOut(this)
                     .addOnSuccessListener {
                         Toast.makeText(this, "Cerraste tu sesión", Toast.LENGTH_SHORT).show()
+                    }
+                    .addOnCompleteListener {
+                        if (it.isSuccessful) {
+                            Toast.makeText(this, "Hacer otra acción", Toast.LENGTH_SHORT).show()
+                        } else {
+                            Toast.makeText(this, "Hacer otra acción", Toast.LENGTH_SHORT).show()
+                        }
                     }
             }
         }
