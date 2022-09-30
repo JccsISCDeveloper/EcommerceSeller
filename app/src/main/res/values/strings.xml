@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">MyEcommerce</string>
     <string name="txt_sign_out">Cerrar sesión</string>
+    <string name="txt_create">Crear</string>
 </resources>
