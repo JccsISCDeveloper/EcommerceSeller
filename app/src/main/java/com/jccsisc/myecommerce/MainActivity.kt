@@ -12,6 +12,7 @@ import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.ErrorCodes
 import com.firebase.ui.auth.IdpResponse
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import com.jccsisc.myecommerce.adapter.OnProductListener
 import com.jccsisc.myecommerce.adapter.ProductAdapter
 import com.jccsisc.myecommerce.databinding.ActivityMainBinding
@@ -67,6 +68,7 @@ class MainActivity : AppCompatActivity(), OnProductListener {
 
             configAuth()
             configRv()
+            configRifestore()
         }
     }
 
@@ -78,7 +80,7 @@ class MainActivity : AppCompatActivity(), OnProductListener {
             adapter = this@MainActivity.adapter
         }
 
-        (1..20).forEach {
+        /*(1..20).forEach {
             val product = ProductModel(
                 it.toString(),
                 "Producto: $it",
@@ -88,7 +90,7 @@ class MainActivity : AppCompatActivity(), OnProductListener {
                 it * 1.2
             )
             adapter.add(product)
-        }
+        }*/
     }
 
     private fun configAuth() {
@@ -151,6 +153,21 @@ class MainActivity : AppCompatActivity(), OnProductListener {
             }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun configRifestore() {
+        val db = FirebaseFirestore.getInstance()
+        db.collection("Products")
+            .get()
+            .addOnSuccessListener { snapshots ->
+                for (document in snapshots) {
+                    val producto = document.toObject(ProductModel::class.java)
+                    adapter.add(producto)
+                }
+            }
+            .addOnFailureListener {
+                Toast.makeText(this, "Error al consultar datos", Toast.LENGTH_SHORT).show()
+            }
     }
 
     override fun onClick(product: ProductModel) {
