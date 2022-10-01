@@ -166,6 +166,7 @@ class MainActivity : AppCompatActivity(), OnProductListener {
             .addOnSuccessListener { snapshots ->
                 for (document in snapshots) {
                     val producto = document.toObject(ProductModel::class.java)
+                    producto.id = document.id
                     adapter.add(producto)
                 }
             }

@@ -55,6 +55,24 @@ class ProductAdapter(private val productList: MutableList<ProductModel>, private
         if (!productList.contains(product)) {
             productList.add(product)
             notifyItemInserted(productList.size -1)
+        } else {
+            update(product)
+        }
+    }
+
+    fun update(product: ProductModel) {
+        val index = productList.indexOf(product)
+        if (index != -1) {
+            productList[index] = product
+            notifyItemChanged(index)
+        }
+    }
+
+    fun delete(product: ProductModel) {
+        val index = productList.indexOf(product)
+        if (index != -1) {
+            productList.removeAt(index)
+            notifyItemRemoved(index)
         }
     }
 }
