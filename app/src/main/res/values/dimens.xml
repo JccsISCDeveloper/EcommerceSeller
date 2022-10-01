@@ -3,4 +3,5 @@
     <dimen name="margin_8">8dp</dimen>
     <dimen name="elevation_4">4dp</dimen>
     <dimen name="width_img_produt_148">148dp</dimen>
+    <dimen name="margin_12">12dp</dimen>
 </resources>

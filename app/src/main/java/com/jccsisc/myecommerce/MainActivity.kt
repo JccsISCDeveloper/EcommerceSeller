@@ -12,7 +12,9 @@ import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.ErrorCodes
 import com.firebase.ui.auth.IdpResponse
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ListenerRegistration
 import com.jccsisc.myecommerce.adapter.OnProductListener
 import com.jccsisc.myecommerce.adapter.ProductAdapter
 import com.jccsisc.myecommerce.databinding.ActivityMainBinding
@@ -26,6 +28,7 @@ class MainActivity : AppCompatActivity(), OnProductListener {
     private lateinit var authStateListener: FirebaseAuth.AuthStateListener
 
     private lateinit var adapter: ProductAdapter
+    private lateinit var firestoreListener: ListenerRegistration
 
     private val resultLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
@@ -69,7 +72,8 @@ class MainActivity : AppCompatActivity(), OnProductListener {
 
             configAuth()
             configRv()
-            configRifestore()
+            //configRifestore()
+            configRifestoreRealtime()
             configButtons()
         }
     }
@@ -173,6 +177,30 @@ class MainActivity : AppCompatActivity(), OnProductListener {
             .addOnFailureListener {
                 Toast.makeText(this, "Error al consultar datos", Toast.LENGTH_SHORT).show()
             }
+    }
+
+    private fun configRifestoreRealtime() {
+        val db = FirebaseFirestore.getInstance()
+
+        val productRef = db.collection("Products")
+
+        firestoreListener = productRef.addSnapshotListener { snapshots, error ->
+            if (error != null) {
+                Toast.makeText(this, "Error al consultar datos", Toast.LENGTH_SHORT).show()
+                return@addSnapshotListener
+            }
+
+            for (snapshot in snapshots!!.documentChanges) {
+                val producto = snapshot.document.toObject(ProductModel::class.java)
+                producto.id = snapshot.document.id
+                when(snapshot.type) {
+                    DocumentChange.Type.ADDED -> adapter.add(producto)
+                    DocumentChange.Type.MODIFIED -> adapter.update(producto)
+                    DocumentChange.Type.REMOVED -> adapter.delete(producto)
+                }
+            }
+        }
+
     }
 
     private fun configButtons() {
