@@ -2,4 +2,8 @@
     <string name="app_name">MyEcommerce</string>
     <string name="txt_sign_out">Cerrar sesión</string>
     <string name="txt_create">Crear</string>
+    <string name="txt_hint_name">Nombre del producto</string>
+    <string name="txt_hint_description">Agregar descripción</string>
+    <string name="txt_hint_quantity">Cantidad</string>
+    <string name="txt_hint_price">Precio</string>
 </resources>
