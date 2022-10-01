@@ -16,6 +16,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.jccsisc.myecommerce.adapter.OnProductListener
 import com.jccsisc.myecommerce.adapter.ProductAdapter
 import com.jccsisc.myecommerce.databinding.ActivityMainBinding
+import com.jccsisc.myecommerce.fragments.addproduct.AddDialogFragment
 import com.jccsisc.myecommerce.model.ProductModel
 
 class MainActivity : AppCompatActivity(), OnProductListener {
@@ -69,6 +70,7 @@ class MainActivity : AppCompatActivity(), OnProductListener {
             configAuth()
             configRv()
             configRifestore()
+            configButtons()
         }
     }
 
@@ -102,6 +104,7 @@ class MainActivity : AppCompatActivity(), OnProductListener {
                 supportActionBar?.title = auth.currentUser?.displayName
                 binding.linearLayoutProgress.visibility = View.GONE
                 binding.nsvProducts.visibility = View.VISIBLE
+                binding.efab.show()
             } else {
                 val providers = arrayListOf(
                     AuthUI.IdpConfig.EmailBuilder().build(),
@@ -146,6 +149,7 @@ class MainActivity : AppCompatActivity(), OnProductListener {
                             Toast.makeText(this, "Hacer otra acción", Toast.LENGTH_SHORT).show()
                             binding.nsvProducts.visibility = View.GONE
                             binding.linearLayoutProgress.visibility = View.VISIBLE
+                            binding.efab.hide()
                         } else {
                             Toast.makeText(this, "Hacer otra acción", Toast.LENGTH_SHORT).show()
                         }
@@ -168,6 +172,12 @@ class MainActivity : AppCompatActivity(), OnProductListener {
             .addOnFailureListener {
                 Toast.makeText(this, "Error al consultar datos", Toast.LENGTH_SHORT).show()
             }
+    }
+
+    private fun configButtons() {
+        binding.efab.setOnClickListener {
+            AddDialogFragment().show(supportFragmentManager, AddDialogFragment::class.java.simpleName)
+        }
     }
 
     override fun onClick(product: ProductModel) {
