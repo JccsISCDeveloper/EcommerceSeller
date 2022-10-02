@@ -19,7 +19,7 @@ import com.jccsisc.myecommerce.databinding.ActivityMainBinding
 import com.jccsisc.myecommerce.fragments.addproduct.AddDialogFragment
 import com.jccsisc.myecommerce.model.ProductModel
 
-class MainActivity : AppCompatActivity(), OnProductListener {
+class MainActivity : AppCompatActivity(), OnProductListener, MainAux {
 
     lateinit var binding: ActivityMainBinding
     private lateinit var firebaseAuth: FirebaseAuth
@@ -27,6 +27,8 @@ class MainActivity : AppCompatActivity(), OnProductListener {
 
     private lateinit var adapter: ProductAdapter
     private lateinit var firestoreListener: ListenerRegistration
+
+    private var productSelected: ProductModel? = null
 
     private val resultLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
@@ -194,12 +196,14 @@ class MainActivity : AppCompatActivity(), OnProductListener {
 
     fun configButtons() {
         binding.efab.setOnClickListener {
+            productSelected = null
             AddDialogFragment().show(supportFragmentManager, AddDialogFragment::class.java.simpleName)
         }
     }
 
     override fun onClick(product: ProductModel) {
-
+        productSelected = product
+        AddDialogFragment().show(supportFragmentManager, AddDialogFragment::class.java.simpleName)
     }
 
     override fun onLongClick(product: ProductModel) {
@@ -214,4 +218,6 @@ class MainActivity : AppCompatActivity(), OnProductListener {
                 }
         }
     }
+
+    override fun getProductSelected(): ProductModel? = productSelected
 }

@@ -9,6 +9,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import com.google.firebase.firestore.FirebaseFirestore
+import com.jccsisc.myecommerce.MainAux
 import com.jccsisc.myecommerce.databinding.FragmentDialogAddBinding
 import com.jccsisc.myecommerce.model.ProductModel
 
@@ -24,6 +25,8 @@ class AddDialogFragment: DialogFragment(), DialogInterface.OnShowListener {
 
     private var positiveButton: Button? = null
     private var negativeButton: Button? = null
+
+    private var product: ProductModel? = null
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         activity?.let { activity ->
@@ -47,6 +50,9 @@ class AddDialogFragment: DialogFragment(), DialogInterface.OnShowListener {
     }
 
     override fun onShow(dialogInterface: DialogInterface?) {
+
+        initProduct()
+
         val dialog = dialog as? AlertDialog
         dialog?.let {
             positiveButton = it.getButton(Dialog.BUTTON_POSITIVE)
@@ -67,6 +73,19 @@ class AddDialogFragment: DialogFragment(), DialogInterface.OnShowListener {
 
             negativeButton?.setOnClickListener {
                 dismiss()
+            }
+        }
+    }
+
+    private fun initProduct() {
+        product = (activity as? MainAux)?.getProductSelected()
+
+        product?.let { product ->
+            binding?.let {
+                it.tieName.setText(product.name)
+                it.tieDescription.setText(product.descrption)
+                it.tieQuantity.setText(product.quantity.toString())
+                it.tiePrice.setText(product.price.toString())
             }
         }
     }
