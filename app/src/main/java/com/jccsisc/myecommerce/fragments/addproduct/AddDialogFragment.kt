@@ -88,25 +88,29 @@ class AddDialogFragment: DialogFragment(), DialogInterface.OnShowListener {
                     if (dataIsNotEmpty(nameD, descriptionD, priceD)) {
                         enableIU(false)
 
-                        uploadImage()
+                        uploadImage() { eventPost ->
+                            if (eventPost.isSuccess) {
+                                if (product == null) {
+                                    val product = ProductModel(
+                                        name = nameD,
+                                        descrption = descriptionD,
+                                        quantity = quantityD.toInt(),
+                                        price = priceD.toDouble(),
+                                        imgUrl = eventPost.photoUrl
+                                    )
 
-                        if (product == null) {
-                            val product = ProductModel(
-                                name = nameD,
-                                descrption = descriptionD,
-                                quantity = quantityD.toInt(),
-                                price = priceD.toDouble()
-                            )
+                                    eventPost.documentId?.let { it1 -> save(product, it1) }
+                                } else {
+                                    product?.apply {
+                                        name = nameD
+                                        descrption = descriptionD
+                                        quantity = quantityD.toInt()
+                                        price = priceD.toDouble()
+                                        imgUrl = eventPost.photoUrl
 
-                            save(product)
-                        } else {
-                            product?.apply {
-                                name = nameD
-                                descrption = descriptionD
-                                quantity = quantityD.toInt()
-                                price = priceD.toDouble()
-
-                                update(this)
+                                        update(this)
+                                    }
+                                }
                             }
                         }
                     } else {
@@ -147,7 +151,7 @@ class AddDialogFragment: DialogFragment(), DialogInterface.OnShowListener {
         resultLauncher.launch(intent)
     }
 
-    private fun uploadImage() {
+    private fun uploadImage(callBack: (EventPost) -> Unit) {
         val eventPost = EventPost()
         eventPost.documentId = FirebaseFirestore.getInstance().collection(COLL_PRODUCTS).document().id
 
@@ -160,17 +164,26 @@ class AddDialogFragment: DialogFragment(), DialogInterface.OnShowListener {
                     .addOnSuccessListener {
                         it.storage.downloadUrl.addOnSuccessListener { downloadUrl ->
                             Log.i("url", downloadUrl.toString())
+                            eventPost.isSuccess = true
+                            eventPost.photoUrl = downloadUrl.toString()
+                            callBack(eventPost)
                         }
+                    }
+                    .addOnFailureListener {
+                        eventPost.isSuccess = false
+                        callBack(eventPost)
                     }
             }
         }
     }
 
-    private fun save(product: ProductModel) {
+    private fun save(product: ProductModel, documentId: String) {
         val db = FirebaseFirestore.getInstance()
 
         db.collection(COLL_PRODUCTS)
-            .add(product)
+            //.add(product)
+            .document(documentId)
+            .set(product)
             .addOnSuccessListener {
                 activity?.showToast("Producto agregado correctamente.")
             }
