@@ -11,7 +11,7 @@ fun MainActivity.initElements() {
         configAuth()
         configRv()
         //configRifestore()
-        configRifestoreRealtime()
+        configFifestoreRealtime()
         configButtons()
 
     }

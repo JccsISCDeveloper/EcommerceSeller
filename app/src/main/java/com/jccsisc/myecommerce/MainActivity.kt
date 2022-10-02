@@ -4,8 +4,6 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
-import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.recyclerview.widget.GridLayoutManager
 import com.firebase.ui.auth.AuthUI
@@ -118,11 +116,13 @@ class MainActivity : AppCompatActivity(), OnProductListener {
     override fun onResume() {
         super.onResume()
         firebaseAuth.addAuthStateListener(authStateListener)
+        configFifestoreRealtime()
     }
 
     override fun onPause() {
         super.onPause()
         firebaseAuth.removeAuthStateListener(authStateListener)
+        firestoreListener.remove()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -168,7 +168,7 @@ class MainActivity : AppCompatActivity(), OnProductListener {
             }
     }
 
-    fun configRifestoreRealtime() {
+    fun configFifestoreRealtime() {
         val db = FirebaseFirestore.getInstance()
 
         val productRef = db.collection("Products")
@@ -203,6 +203,15 @@ class MainActivity : AppCompatActivity(), OnProductListener {
     }
 
     override fun onLongClick(product: ProductModel) {
+        val db = FirebaseFirestore.getInstance()
+        val productRef = db.collection("Products")
 
+        product.id?.let { id ->
+            productRef.document(id)
+                .delete()
+                .addOnFailureListener {
+                    showToast("Error al eleiminar el producto")
+                }
+        }
     }
 }
