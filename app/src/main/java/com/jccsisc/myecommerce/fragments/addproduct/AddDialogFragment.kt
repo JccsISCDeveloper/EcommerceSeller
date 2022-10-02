@@ -13,6 +13,8 @@ import android.widget.Button
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import com.jccsisc.myecommerce.Constants.COLL_PRODUCTS
@@ -42,7 +44,16 @@ class AddDialogFragment: DialogFragment(), DialogInterface.OnShowListener {
         if (it.resultCode == Activity.RESULT_OK) {
             photoSelectedUri = it.data?.data
 
-            binding?.imgProduct?.setImageURI(photoSelectedUri)
+            //binding?.imgProduct?.setImageURI(photoSelectedUri)
+
+            //Glide con imagen local
+            binding?.let {
+                Glide.with(this)
+                    .load(photoSelectedUri)
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .centerCrop()
+                    .into(it.imgProduct)
+            }
         }
     }
 
@@ -134,6 +145,12 @@ class AddDialogFragment: DialogFragment(), DialogInterface.OnShowListener {
                 it.tieDescription.setText(product.descrption)
                 it.tieQuantity.setText(product.quantity.toString())
                 it.tiePrice.setText(product.price.toString())
+
+                Glide.with(this)
+                    .load(product.imgUrl)
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .centerCrop()
+                    .into(it.imgProduct)
             }
         }
     }

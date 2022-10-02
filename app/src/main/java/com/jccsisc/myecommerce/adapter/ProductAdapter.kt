@@ -5,6 +5,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.jccsisc.myecommerce.R
 import com.jccsisc.myecommerce.databinding.ItemProductBinding
 import com.jccsisc.myecommerce.model.ProductModel
@@ -31,6 +33,11 @@ class ProductAdapter(private val productList: MutableList<ProductModel>, private
         holder.binding.tvPrice.text = product.price.toString()
         holder.binding.tvQuantity.text = product.quantity.toString()
 
+        Glide.with(context)
+            .load(product.imgUrl)
+            .diskCacheStrategy(DiskCacheStrategy.ALL)
+            .centerCrop()
+            .into(holder.binding.imgProduct)
     }
 
     override fun getItemCount() = productList.size
