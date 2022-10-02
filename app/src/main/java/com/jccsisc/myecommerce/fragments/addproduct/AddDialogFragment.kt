@@ -29,7 +29,7 @@ import com.jccsisc.myecommerce.showToast
  * FROM: com.jccsisc.myecommerce.fragments.addproduct
  * Created by Julio Cesar Camacho Silva on 30/09/22
  */
-class AddDialogFragment: DialogFragment(), DialogInterface.OnShowListener {
+class AddDialogFragment : DialogFragment(), DialogInterface.OnShowListener {
 
 
     private var binding: FragmentDialogAddBinding? = null
@@ -40,22 +40,23 @@ class AddDialogFragment: DialogFragment(), DialogInterface.OnShowListener {
     private var product: ProductModel? = null
 
     private var photoSelectedUri: Uri? = null
-    private val resultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-        if (it.resultCode == Activity.RESULT_OK) {
-            photoSelectedUri = it.data?.data
+    private val resultLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            if (it.resultCode == Activity.RESULT_OK) {
+                photoSelectedUri = it.data?.data
 
-            //binding?.imgProduct?.setImageURI(photoSelectedUri)
+                //binding?.imgProduct?.setImageURI(photoSelectedUri)
 
-            //Glide con imagen local
-            binding?.let {
-                Glide.with(this)
-                    .load(photoSelectedUri)
-                    .diskCacheStrategy(DiskCacheStrategy.ALL)
-                    .centerCrop()
-                    .into(it.imgProduct)
+                //Glide con imagen local
+                binding?.let {
+                    Glide.with(this)
+                        .load(photoSelectedUri)
+                        .diskCacheStrategy(DiskCacheStrategy.ALL)
+                        .centerCrop()
+                        .into(it.imgProduct)
+                }
             }
         }
-    }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         activity?.let { activity ->
@@ -99,7 +100,7 @@ class AddDialogFragment: DialogFragment(), DialogInterface.OnShowListener {
                     if (dataIsNotEmpty(nameD, descriptionD, priceD)) {
                         enableIU(false)
 
-                        uploadImage() { eventPost ->
+                        uploadImage(product?.id) { eventPost ->
                             if (eventPost.isSuccess) {
                                 if (product == null) {
                                     val product = ProductModel(
@@ -168,9 +169,10 @@ class AddDialogFragment: DialogFragment(), DialogInterface.OnShowListener {
         resultLauncher.launch(intent)
     }
 
-    private fun uploadImage(callBack: (EventPost) -> Unit) {
+    private fun uploadImage(productId: String?, callBack: (EventPost) -> Unit) {
         val eventPost = EventPost()
-        eventPost.documentId = FirebaseFirestore.getInstance().collection(COLL_PRODUCTS).document().id
+        eventPost.documentId =
+            productId ?: FirebaseFirestore.getInstance().collection(COLL_PRODUCTS).document().id
 
         val storageRef = FirebaseStorage.getInstance().reference.child(STORAGE_IMAGE)
 
