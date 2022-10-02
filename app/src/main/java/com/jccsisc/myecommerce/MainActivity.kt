@@ -23,7 +23,7 @@ import com.jccsisc.myecommerce.model.ProductModel
 
 class MainActivity : AppCompatActivity(), OnProductListener {
 
-    private lateinit var binding: ActivityMainBinding
+    lateinit var binding: ActivityMainBinding
     private lateinit var firebaseAuth: FirebaseAuth
     private lateinit var authStateListener: FirebaseAuth.AuthStateListener
 
@@ -38,25 +38,20 @@ class MainActivity : AppCompatActivity(), OnProductListener {
                 val user = FirebaseAuth.getInstance().currentUser
 
                 if (user != null) {
-                    Toast.makeText(this@MainActivity, "Bienvenido ", Toast.LENGTH_SHORT).show()
-                    binding.nsvProducts.visibility = View.VISIBLE
-                    binding.linearLayoutProgress.visibility = View.GONE
+                    showToast("Bienvenido")
+                    binding.nsvProducts.showView()
+                    binding.linearLayoutProgress.showView(false)
                 }
             } else {
                 if (response == null) {
-                    Toast.makeText(this@MainActivity, "Hasta pronto ", Toast.LENGTH_SHORT).show()
+                    showToast("Hasta pronto")
                     finish()
                 } else {
                     response.error?.let { error ->
                         if (error.errorCode == ErrorCodes.NO_NETWORK) {
-                            Toast.makeText(this, "No hay conexión a internet", Toast.LENGTH_SHORT)
-                                .show()
+                            showToast("No hay conexión a internet")
                         } else {
-                            Toast.makeText(
-                                this,
-                                "Código de error: ${error.errorCode}",
-                                Toast.LENGTH_SHORT
-                            ).show()
+                            showToast("Código de error: ${error.errorCode}")
                         }
                     }
                 }
@@ -68,17 +63,11 @@ class MainActivity : AppCompatActivity(), OnProductListener {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.apply {
+        initElements()
 
-            configAuth()
-            configRv()
-            //configRifestore()
-            configRifestoreRealtime()
-            configButtons()
-        }
     }
 
-    private fun configRv() {
+    fun configRv() {
         adapter = ProductAdapter(mutableListOf(), this)
         binding.rvProducts.apply {
             layoutManager =
@@ -99,15 +88,15 @@ class MainActivity : AppCompatActivity(), OnProductListener {
         }*/
     }
 
-    private fun configAuth() {
+    fun configAuth() {
 
         firebaseAuth = FirebaseAuth.getInstance()
         authStateListener = FirebaseAuth.AuthStateListener { auth ->
 
             if (auth.currentUser != null) {
                 supportActionBar?.title = auth.currentUser?.displayName
-                binding.linearLayoutProgress.visibility = View.GONE
-                binding.nsvProducts.visibility = View.VISIBLE
+                binding.linearLayoutProgress.showView(false)
+                binding.nsvProducts.showView()
                 binding.efab.show()
             } else {
                 val providers = arrayListOf(
@@ -146,16 +135,16 @@ class MainActivity : AppCompatActivity(), OnProductListener {
             R.id.action_sign_out -> {
                 AuthUI.getInstance().signOut(this)
                     .addOnSuccessListener {
-                        Toast.makeText(this, "Cerraste tu sesión", Toast.LENGTH_SHORT).show()
+                        showToast("Cerraste tu sesión")
                     }
                     .addOnCompleteListener {
                         if (it.isSuccessful) {
-                            Toast.makeText(this, "Hacer otra acción", Toast.LENGTH_SHORT).show()
-                            binding.nsvProducts.visibility = View.GONE
-                            binding.linearLayoutProgress.visibility = View.VISIBLE
+                            showToast("Hacer otra acción")
+                            binding.nsvProducts.showView(false)
+                            binding.linearLayoutProgress.showView()
                             binding.efab.hide()
                         } else {
-                            Toast.makeText(this, "Hacer otra acción", Toast.LENGTH_SHORT).show()
+                            showToast("Hacer otra acción")
                         }
                     }
             }
@@ -163,7 +152,7 @@ class MainActivity : AppCompatActivity(), OnProductListener {
         return super.onOptionsItemSelected(item)
     }
 
-    private fun configRifestore() {
+    fun configRifestore() {
         val db = FirebaseFirestore.getInstance()
         db.collection("Products")
             .get()
@@ -175,18 +164,18 @@ class MainActivity : AppCompatActivity(), OnProductListener {
                 }
             }
             .addOnFailureListener {
-                Toast.makeText(this, "Error al consultar datos", Toast.LENGTH_SHORT).show()
+                showToast("Error al consultar datos")
             }
     }
 
-    private fun configRifestoreRealtime() {
+    fun configRifestoreRealtime() {
         val db = FirebaseFirestore.getInstance()
 
         val productRef = db.collection("Products")
 
         firestoreListener = productRef.addSnapshotListener { snapshots, error ->
             if (error != null) {
-                Toast.makeText(this, "Error al consultar datos", Toast.LENGTH_SHORT).show()
+                showToast("Error al consultar datos")
                 return@addSnapshotListener
             }
 
@@ -203,7 +192,7 @@ class MainActivity : AppCompatActivity(), OnProductListener {
 
     }
 
-    private fun configButtons() {
+    fun configButtons() {
         binding.efab.setOnClickListener {
             AddDialogFragment().show(supportFragmentManager, AddDialogFragment::class.java.simpleName)
         }
