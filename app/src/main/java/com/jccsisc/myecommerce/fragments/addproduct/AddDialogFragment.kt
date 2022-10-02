@@ -1,15 +1,23 @@
 package com.jccsisc.myecommerce.fragments.addproduct
 
+import android.app.Activity
 import android.app.Dialog
 import android.content.DialogInterface
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
+import android.util.Log
 import android.view.LayoutInflater
 import android.widget.Button
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
 import com.jccsisc.myecommerce.Constants.COLL_PRODUCTS
+import com.jccsisc.myecommerce.Constants.STORAGE_IMAGE
 import com.jccsisc.myecommerce.MainAux
 import com.jccsisc.myecommerce.databinding.FragmentDialogAddBinding
 import com.jccsisc.myecommerce.model.ProductModel
@@ -29,6 +37,15 @@ class AddDialogFragment: DialogFragment(), DialogInterface.OnShowListener {
     private var negativeButton: Button? = null
 
     private var product: ProductModel? = null
+
+    private var photoSelectedUri: Uri? = null
+    private val resultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+        if (it.resultCode == Activity.RESULT_OK) {
+            photoSelectedUri = it.data?.data
+
+            binding?.imgProduct?.setImageURI(photoSelectedUri)
+        }
+    }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         activity?.let { activity ->
@@ -54,6 +71,7 @@ class AddDialogFragment: DialogFragment(), DialogInterface.OnShowListener {
     override fun onShow(dialogInterface: DialogInterface?) {
 
         initProduct()
+        configButtons()
 
         val dialog = dialog as? AlertDialog
         dialog?.let {
@@ -70,6 +88,8 @@ class AddDialogFragment: DialogFragment(), DialogInterface.OnShowListener {
 
                     if (dataIsNotEmpty(nameD, descriptionD, priceD)) {
                         enableIU(false)
+
+                        uploadImage()
 
                         if (product == null) {
                             val product = ProductModel(
@@ -111,6 +131,34 @@ class AddDialogFragment: DialogFragment(), DialogInterface.OnShowListener {
                 it.tieDescription.setText(product.descrption)
                 it.tieQuantity.setText(product.quantity.toString())
                 it.tiePrice.setText(product.price.toString())
+            }
+        }
+    }
+
+    private fun configButtons() {
+        binding?.let {
+            it.imbProduct.setOnClickListener {
+                openGallery()
+            }
+        }
+    }
+
+    private fun openGallery() {
+        val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+        resultLauncher.launch(intent)
+    }
+
+    private fun uploadImage() {
+        val storageRef = FirebaseStorage.getInstance().reference.child(STORAGE_IMAGE)
+
+        photoSelectedUri?.let { uri ->
+            binding?.let { v ->
+                storageRef.putFile(uri)
+                    .addOnSuccessListener {
+                        it.storage.downloadUrl.addOnSuccessListener { downloadUrl ->
+                            Log.i("url", downloadUrl.toString())
+                        }
+                    }
             }
         }
     }

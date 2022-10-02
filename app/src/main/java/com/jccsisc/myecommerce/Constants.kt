@@ -7,5 +7,6 @@ package com.jccsisc.myecommerce
  */
 object Constants {
     const val COLL_PRODUCTS = "Products"
+    const val STORAGE_IMAGE = "image"
 
 }
