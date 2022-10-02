@@ -13,6 +13,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
+import com.jccsisc.myecommerce.Constants.COLL_PRODUCTS
 import com.jccsisc.myecommerce.adapter.OnProductListener
 import com.jccsisc.myecommerce.adapter.ProductAdapter
 import com.jccsisc.myecommerce.databinding.ActivityMainBinding
@@ -156,7 +157,7 @@ class MainActivity : AppCompatActivity(), OnProductListener, MainAux {
 
     fun configRifestore() {
         val db = FirebaseFirestore.getInstance()
-        db.collection("Products")
+        db.collection(COLL_PRODUCTS)
             .get()
             .addOnSuccessListener { snapshots ->
                 for (document in snapshots) {
@@ -173,7 +174,7 @@ class MainActivity : AppCompatActivity(), OnProductListener, MainAux {
     fun configFifestoreRealtime() {
         val db = FirebaseFirestore.getInstance()
 
-        val productRef = db.collection("Products")
+        val productRef = db.collection(COLL_PRODUCTS)
 
         firestoreListener = productRef.addSnapshotListener { snapshots, error ->
             if (error != null) {
@@ -208,7 +209,7 @@ class MainActivity : AppCompatActivity(), OnProductListener, MainAux {
 
     override fun onLongClick(product: ProductModel) {
         val db = FirebaseFirestore.getInstance()
-        val productRef = db.collection("Products")
+        val productRef = db.collection(COLL_PRODUCTS)
 
         product.id?.let { id ->
             productRef.document(id)

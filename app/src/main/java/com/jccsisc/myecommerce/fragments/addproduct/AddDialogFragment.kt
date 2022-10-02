@@ -9,6 +9,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import com.google.firebase.firestore.FirebaseFirestore
+import com.jccsisc.myecommerce.Constants.COLL_PRODUCTS
 import com.jccsisc.myecommerce.MainAux
 import com.jccsisc.myecommerce.databinding.FragmentDialogAddBinding
 import com.jccsisc.myecommerce.model.ProductModel
@@ -62,24 +63,35 @@ class AddDialogFragment: DialogFragment(), DialogInterface.OnShowListener {
             positiveButton?.setOnClickListener {
                 binding?.let { v ->
 
-                    if (product == null) {
-                        val product = ProductModel(
-                            name = v.tieName.text.toString().trim(),
-                            descrption = v.tieDescription.text.toString().trim(),
-                            quantity = v.tieQuantity.text.toString().toInt(),
-                            price = v.tiePrice.text.toString().toDouble()
-                        )
+                    val nameD = v.tieName.text.toString()
+                    val descriptionD = v.tieDescription.text.toString()
+                    val quantityD = v.tieQuantity.text.toString()
+                    val priceD = v.tiePrice.text.toString()
 
-                        save(product)
-                    } else {
-                        product?.apply {
-                            name = v.tieName.text.toString().trim()
-                            descrption = v.tieDescription.text.toString().trim()
-                            quantity = v.tieQuantity.text.toString().toInt()
-                            price = v.tiePrice.text.toString().toDouble()
+                    if (dataIsNotEmpty(nameD, descriptionD, priceD)) {
+                        enableIU(false)
 
-                            update(this)
+                        if (product == null) {
+                            val product = ProductModel(
+                                name = nameD,
+                                descrption = descriptionD,
+                                quantity = quantityD.toInt(),
+                                price = priceD.toDouble()
+                            )
+
+                            save(product)
+                        } else {
+                            product?.apply {
+                                name = nameD
+                                descrption = descriptionD
+                                quantity = quantityD.toInt()
+                                price = priceD.toDouble()
+
+                                update(this)
+                            }
                         }
+                    } else {
+                        activity?.showToast("Error al ingresar los datos")
                     }
                 }
             }
@@ -106,7 +118,7 @@ class AddDialogFragment: DialogFragment(), DialogInterface.OnShowListener {
     private fun save(product: ProductModel) {
         val db = FirebaseFirestore.getInstance()
 
-        db.collection("Products")
+        db.collection(COLL_PRODUCTS)
             .add(product)
             .addOnSuccessListener {
                 activity?.showToast("Producto agregado correctamente.")
@@ -115,6 +127,7 @@ class AddDialogFragment: DialogFragment(), DialogInterface.OnShowListener {
                 activity?.showToast("Error al agregar el producto.")
             }
             .addOnCompleteListener {
+                enableIU(true)
                 dismiss()
             }
     }
@@ -123,7 +136,7 @@ class AddDialogFragment: DialogFragment(), DialogInterface.OnShowListener {
         val db = FirebaseFirestore.getInstance()
 
         product.id?.let { id ->
-            db.collection("Products")
+            db.collection(COLL_PRODUCTS)
                 .document(id)
                 .set(product)
                 .addOnSuccessListener {
@@ -133,10 +146,28 @@ class AddDialogFragment: DialogFragment(), DialogInterface.OnShowListener {
                     activity?.showToast("Error al actualizar el producto.")
                 }
                 .addOnCompleteListener {
+                    enableIU(true)
                     dismiss()
                 }
         }
     }
+
+    private fun enableIU(enable: Boolean) {
+        positiveButton?.isEnabled = enable
+        negativeButton?.isEnabled = enable
+
+        binding?.let {
+            with(it) {
+                tieName.isEnabled = enable
+                tieDescription.isEnabled = enable
+                tieQuantity.isEnabled = enable
+                tiePrice.isEnabled = enable
+            }
+        }
+    }
+
+    private fun dataIsNotEmpty(name: String, description: String, price: String) =
+        name.isNotEmpty() && description.isNotEmpty() && price != "0.0" && price != "0"
 
     override fun onDestroyView() {
         super.onDestroyView()
