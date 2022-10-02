@@ -90,4 +90,27 @@
 
     </com.google.android.material.textfield.TextInputLayout>
 
+    <ImageView
+        android:id="@+id/imgProduct"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="@dimen/margin_8"
+        android:layout_marginEnd="@dimen/margin_8"
+        android:background="@color/gray_100"
+        app:layout_constraintTop_toBottomOf="@+id/tilQuantity"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/guideline"
+        app:layout_constraintDimensionRatio="16:9"/>
+
+    <ImageButton
+        android:id="@+id/imbProduct"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:src="@drawable/ic_image_search"
+        android:background="?attr/selectableItemBackground"
+        app:layout_constraintTop_toTopOf="@+id/imgProduct"
+        app:layout_constraintStart_toStartOf="@+id/imgProduct"
+        app:layout_constraintEnd_toEndOf="@+id/imgProduct"
+        app:layout_constraintBottom_toBottomOf="@+id/imgProduct"/>
+
 </androidx.constraintlayout.widget.ConstraintLayout>
