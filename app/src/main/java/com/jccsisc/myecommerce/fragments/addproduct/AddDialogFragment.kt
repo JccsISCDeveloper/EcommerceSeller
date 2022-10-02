@@ -12,6 +12,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.jccsisc.myecommerce.MainAux
 import com.jccsisc.myecommerce.databinding.FragmentDialogAddBinding
 import com.jccsisc.myecommerce.model.ProductModel
+import com.jccsisc.myecommerce.showToast
 
 /**
  * Project: MyEcommerce
@@ -60,14 +61,26 @@ class AddDialogFragment: DialogFragment(), DialogInterface.OnShowListener {
 
             positiveButton?.setOnClickListener {
                 binding?.let { v ->
-                    val product = ProductModel(
-                        name = v.tieName.text.toString().trim(),
-                        descrption = v.tieDescription.text.toString().trim(),
-                        quantity = v.tieQuantity.text.toString().toInt(),
-                        price = v.tiePrice.text.toString().toDouble()
-                    )
 
-                    save(product)
+                    if (product == null) {
+                        val product = ProductModel(
+                            name = v.tieName.text.toString().trim(),
+                            descrption = v.tieDescription.text.toString().trim(),
+                            quantity = v.tieQuantity.text.toString().toInt(),
+                            price = v.tiePrice.text.toString().toDouble()
+                        )
+
+                        save(product)
+                    } else {
+                        product?.apply {
+                            name = v.tieName.text.toString().trim()
+                            descrption = v.tieDescription.text.toString().trim()
+                            quantity = v.tieQuantity.text.toString().toInt()
+                            price = v.tiePrice.text.toString().toDouble()
+
+                            update(this)
+                        }
+                    }
                 }
             }
 
@@ -96,14 +109,33 @@ class AddDialogFragment: DialogFragment(), DialogInterface.OnShowListener {
         db.collection("Products")
             .add(product)
             .addOnSuccessListener {
-                Toast.makeText(activity, "Producto agregado correctamente.", Toast.LENGTH_SHORT).show()
+                activity?.showToast("Producto agregado correctamente.")
             }
             .addOnFailureListener {
-                Toast.makeText(activity, "Error al agregar el producto.", Toast.LENGTH_SHORT).show()
+                activity?.showToast("Error al agregar el producto.")
             }
             .addOnCompleteListener {
                 dismiss()
             }
+    }
+
+    private fun update(product: ProductModel) {
+        val db = FirebaseFirestore.getInstance()
+
+        product.id?.let { id ->
+            db.collection("Products")
+                .document(id)
+                .set(product)
+                .addOnSuccessListener {
+                    activity?.showToast("Producto actualizado correctamente.")
+                }
+                .addOnFailureListener {
+                    activity?.showToast("Error al actualizar el producto.")
+                }
+                .addOnCompleteListener {
+                    dismiss()
+                }
+        }
     }
 
     override fun onDestroyView() {
