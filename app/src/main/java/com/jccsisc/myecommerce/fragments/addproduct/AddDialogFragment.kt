@@ -10,7 +10,6 @@ import android.provider.MediaStore
 import android.util.Log
 import android.view.LayoutInflater
 import android.widget.Button
-import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
@@ -149,11 +148,15 @@ class AddDialogFragment: DialogFragment(), DialogInterface.OnShowListener {
     }
 
     private fun uploadImage() {
+        val eventPost = EventPost()
+        eventPost.documentId = FirebaseFirestore.getInstance().collection(COLL_PRODUCTS).document().id
+
         val storageRef = FirebaseStorage.getInstance().reference.child(STORAGE_IMAGE)
 
         photoSelectedUri?.let { uri ->
             binding?.let { v ->
-                storageRef.putFile(uri)
+                val photoRef = storageRef.child(eventPost.documentId!!)
+                photoRef.putFile(uri)
                     .addOnSuccessListener {
                         it.storage.downloadUrl.addOnSuccessListener { downloadUrl ->
                             Log.i("url", downloadUrl.toString())
