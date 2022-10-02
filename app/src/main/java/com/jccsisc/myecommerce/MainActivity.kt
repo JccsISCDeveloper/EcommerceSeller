@@ -19,6 +19,8 @@ import com.jccsisc.myecommerce.adapter.ProductAdapter
 import com.jccsisc.myecommerce.databinding.ActivityMainBinding
 import com.jccsisc.myecommerce.fragments.addproduct.AddDialogFragment
 import com.jccsisc.myecommerce.model.ProductModel
+import com.jccsisc.myecommerce.utils.showToast
+import com.jccsisc.myecommerce.utils.showView
 
 class MainActivity : AppCompatActivity(), OnProductListener, MainAux {
 

@@ -20,10 +20,12 @@ import com.google.firebase.storage.FirebaseStorage
 import com.jccsisc.myecommerce.Constants.COLL_PRODUCTS
 import com.jccsisc.myecommerce.Constants.STORAGE_IMAGE
 import com.jccsisc.myecommerce.MainAux
+import com.jccsisc.myecommerce.R
 import com.jccsisc.myecommerce.databinding.FragmentDialogAddBinding
 import com.jccsisc.myecommerce.model.ProductModel
-import com.jccsisc.myecommerce.showToast
-import com.jccsisc.myecommerce.showView
+import com.jccsisc.myecommerce.utils.setColor
+import com.jccsisc.myecommerce.utils.showToast
+import com.jccsisc.myecommerce.utils.showView
 
 /**
  * Project: MyEcommerce
@@ -53,7 +55,7 @@ class AddDialogFragment : DialogFragment(), DialogInterface.OnShowListener {
                     Glide.with(this)
                         .load(photoSelectedUri)
                         .diskCacheStrategy(DiskCacheStrategy.ALL)
-                        .centerCrop()
+                        .centerInside()
                         .into(v.imgProduct)
 
                     v.imbProduct
@@ -153,7 +155,7 @@ class AddDialogFragment : DialogFragment(), DialogInterface.OnShowListener {
                 Glide.with(this)
                     .load(product.imgUrl)
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
-                    .centerCrop()
+                    .centerInside()
                     .into(it.imgProduct)
             }
         }
@@ -188,6 +190,9 @@ class AddDialogFragment : DialogFragment(), DialogInterface.OnShowListener {
 
                 photoRef.putFile(uri)
                     .addOnProgressListener {
+
+                        colorResponse(true)
+
                         val progress = (100 * it.bytesTransferred / it.totalByteCount).toInt()
                         it.run {
                             v.progressBar.progress = progress
@@ -205,6 +210,9 @@ class AddDialogFragment : DialogFragment(), DialogInterface.OnShowListener {
                     }
                     .addOnFailureListener {
                         eventPost.isSuccess = false
+                        enableIU(true)
+                        activity?.showToast("Error al subir imagen")
+                        colorResponse(false)
                         callBack(eventPost)
                     }
             }
@@ -268,6 +276,12 @@ class AddDialogFragment : DialogFragment(), DialogInterface.OnShowListener {
 
     private fun dataIsNotEmpty(name: String, description: String, price: String) =
         name.isNotEmpty() && description.isNotEmpty() && price != "0.0" && price != "0"
+
+    private fun colorResponse(isOk: Boolean) {
+
+        activity?.setColor(if (isOk) R.color.blue_gray_800_dark else R.color.red_100)
+            ?.let { it1 -> binding?.tvProgress?.setTextColor(it1) }
+    }
 
     override fun onDestroyView() {
         super.onDestroyView()

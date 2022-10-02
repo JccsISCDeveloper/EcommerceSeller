@@ -1,8 +1,9 @@
-package com.jccsisc.myecommerce
+package com.jccsisc.myecommerce.utils
 
 import android.app.Activity
 import android.view.View
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 
 /**
  * Project: MyEcommerce
@@ -18,3 +19,5 @@ fun View.showView(showV: Boolean = true) {
 fun Activity.showToast(msg: String, duration: Int = Toast.LENGTH_SHORT) {
     Toast.makeText(this, msg, duration).show()
 }
+
+fun Activity.setColor(color: Int) = ContextCompat.getColor(this, color)
