@@ -6,4 +6,6 @@
     <string name="txt_hint_description">Agregar descripción</string>
     <string name="txt_hint_quantity">Cantidad</string>
     <string name="txt_hint_price">Precio</string>
+
+    <string name="str_price">$%s</string>
 </resources>

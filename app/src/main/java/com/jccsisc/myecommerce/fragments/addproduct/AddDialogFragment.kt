@@ -23,6 +23,7 @@ import com.jccsisc.myecommerce.MainAux
 import com.jccsisc.myecommerce.databinding.FragmentDialogAddBinding
 import com.jccsisc.myecommerce.model.ProductModel
 import com.jccsisc.myecommerce.showToast
+import com.jccsisc.myecommerce.showView
 
 /**
  * Project: MyEcommerce
@@ -48,12 +49,14 @@ class AddDialogFragment : DialogFragment(), DialogInterface.OnShowListener {
                 //binding?.imgProduct?.setImageURI(photoSelectedUri)
 
                 //Glide con imagen local
-                binding?.let {
+                binding?.let { v ->
                     Glide.with(this)
                         .load(photoSelectedUri)
                         .diskCacheStrategy(DiskCacheStrategy.ALL)
                         .centerCrop()
-                        .into(it.imgProduct)
+                        .into(v.imgProduct)
+
+                    v.imbProduct
                 }
             }
         }
@@ -178,8 +181,20 @@ class AddDialogFragment : DialogFragment(), DialogInterface.OnShowListener {
 
         photoSelectedUri?.let { uri ->
             binding?.let { v ->
+
+                v.progressBar.showView()
+
                 val photoRef = storageRef.child(eventPost.documentId!!)
+
                 photoRef.putFile(uri)
+                    .addOnProgressListener {
+                        val progress = (100 * it.bytesTransferred / it.totalByteCount).toInt()
+                        it.run {
+                            v.progressBar.progress = progress
+                            v.tvProgress.text = String.format("%s%%", progress)
+                        }
+
+                    }
                     .addOnSuccessListener {
                         it.storage.downloadUrl.addOnSuccessListener { downloadUrl ->
                             Log.i("url", downloadUrl.toString())
@@ -211,6 +226,7 @@ class AddDialogFragment : DialogFragment(), DialogInterface.OnShowListener {
             }
             .addOnCompleteListener {
                 enableIU(true)
+                binding?.progressBar?.showView(false)
                 dismiss()
             }
     }
@@ -230,6 +246,7 @@ class AddDialogFragment : DialogFragment(), DialogInterface.OnShowListener {
                 }
                 .addOnCompleteListener {
                     enableIU(true)
+                    binding?.progressBar?.showView(false)
                     dismiss()
                 }
         }

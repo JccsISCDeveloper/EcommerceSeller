@@ -30,7 +30,7 @@ class ProductAdapter(private val productList: MutableList<ProductModel>, private
         val product = productList[position]
         holder.setListener(product)
         holder.binding.tvName.text = product.name
-        holder.binding.tvPrice.text = product.price.toString()
+        holder.binding.tvPrice.text = context.getString(R.string.str_price, product.price.toString())
         holder.binding.tvQuantity.text = product.quantity.toString()
 
         Glide.with(context)
