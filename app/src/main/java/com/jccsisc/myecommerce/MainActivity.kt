@@ -107,6 +107,7 @@ class MainActivity : AppCompatActivity(), OnProductListener, MainAux {
                     AuthUI.IdpConfig.GoogleBuilder().build()
                 )
 
+                //Lanzamos la Intent por defecto de la libería con los proveedores
                 resultLauncher.launch(
                     AuthUI.getInstance()
                         .createSignInIntentBuilder()

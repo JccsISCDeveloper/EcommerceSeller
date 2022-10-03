@@ -57,8 +57,6 @@ class AddDialogFragment : DialogFragment(), DialogInterface.OnShowListener {
                         .diskCacheStrategy(DiskCacheStrategy.ALL)
                         .centerInside()
                         .into(v.imgProduct)
-
-                    v.imbProduct
                 }
             }
         }
@@ -78,7 +76,6 @@ class AddDialogFragment : DialogFragment(), DialogInterface.OnShowListener {
                 dialog.setOnShowListener(this)
 
                 return dialog
-
             }
         }
         return super.onCreateDialog(savedInstanceState)
